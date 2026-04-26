@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Regression Calibration Demo</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Regression Calibration demo_solution_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Regression Calibration demo_solution_files/libs/quarto-html/quarto.js"></script>
+<script src="Regression Calibration demo_solution_files/libs/quarto-html/popper.min.js"></script>
+<script src="Regression Calibration demo_solution_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Regression Calibration demo_solution_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Regression Calibration demo_solution_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Regression Calibration demo_solution_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Regression Calibration demo_solution_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Regression Calibration demo_solution_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Regression Calibration demo_solution_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#two-methods-for-regression-calibration-if-validation-study-available" id="toc-two-methods-for-regression-calibration-if-validation-study-available" class="nav-link active" data-scroll-target="#two-methods-for-regression-calibration-if-validation-study-available">1. Two Methods for Regression Calibration if Validation Study Available</a>
+  <ul>
+  <li><a href="#introduction-to-data-set" id="toc-introduction-to-data-set" class="nav-link" data-scroll-target="#introduction-to-data-set">1.1 Introduction to Data Set</a>
+  <ul>
+  <li><a href="#variable-dictionary" id="toc-variable-dictionary" class="nav-link" data-scroll-target="#variable-dictionary">Variable Dictionary</a></li>
+  </ul></li>
+  <li><a href="#importing-data" id="toc-importing-data" class="nav-link" data-scroll-target="#importing-data">1.2 Importing Data</a></li>
+  <li><a href="#data-exploration" id="toc-data-exploration" class="nav-link" data-scroll-target="#data-exploration">1.3 Data Exploration</a></li>
+  <li><a href="#naive-analysis" id="toc-naive-analysis" class="nav-link" data-scroll-target="#naive-analysis">1.4 Naive Analysis</a></li>
+  <li><a href="#regression-calibration-deattenuation-factor-method-rc-df" id="toc-regression-calibration-deattenuation-factor-method-rc-df" class="nav-link" data-scroll-target="#regression-calibration-deattenuation-factor-method-rc-df">1.5 Regression Calibration – Deattenuation Factor Method (RC-DF)</a>
+  <ul>
+  <li><a href="#assumptions" id="toc-assumptions" class="nav-link" data-scroll-target="#assumptions">Assumptions</a></li>
+  <li><a href="#running-code" id="toc-running-code" class="nav-link" data-scroll-target="#running-code">Running code</a></li>
+  </ul></li>
+  <li><a href="#regression-calibration-imputation-method-rc-im" id="toc-regression-calibration-imputation-method-rc-im" class="nav-link" data-scroll-target="#regression-calibration-imputation-method-rc-im">1.6 Regression Calibration – Imputation Method (RC-IM)</a>
+  <ul>
+  <li><a href="#assumptions-1" id="toc-assumptions-1" class="nav-link" data-scroll-target="#assumptions-1">Assumptions</a></li>
+  <li><a href="#running-code-1" id="toc-running-code-1" class="nav-link" data-scroll-target="#running-code-1">Running code</a></li>
+  <li><a href="#results-comparison" id="toc-results-comparison" class="nav-link" data-scroll-target="#results-comparison">Results Comparison</a></li>
+  </ul></li>
+  <li><a href="#nonlinearity-in-the-measurement-error-model" id="toc-nonlinearity-in-the-measurement-error-model" class="nav-link" data-scroll-target="#nonlinearity-in-the-measurement-error-model">1.7 Nonlinearity in the Measurement Error Model</a></li>
+  <li><a href="#exercise" id="toc-exercise" class="nav-link" data-scroll-target="#exercise">Exercise</a>
+  <ul>
+  <li><a href="#testing-the-linearity-of-the-measurement-error-model" id="toc-testing-the-linearity-of-the-measurement-error-model" class="nav-link" data-scroll-target="#testing-the-linearity-of-the-measurement-error-model">Testing the linearity of the measurement error model</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#reliability-study-available" id="toc-reliability-study-available" class="nav-link" data-scroll-target="#reliability-study-available">2. Reliability Study Available</a></li>
+  <li><a href="#other-packages-on-regression-calibration" id="toc-other-packages-on-regression-calibration" class="nav-link" data-scroll-target="#other-packages-on-regression-calibration">3. Other Packages on Regression Calibration</a></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Regression Calibration Demo</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<p>In this demo, we mainly focus on correcting for measurement error in covariates when the outcome is binary.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("dplyr")</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("matrixcalc")</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("earth")</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(matrixcalc)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(earth)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="two-methods-for-regression-calibration-if-validation-study-available" class="level2">
+<h2 class="anchored" data-anchor-id="two-methods-for-regression-calibration-if-validation-study-available">1. Two Methods for Regression Calibration if Validation Study Available</h2>
+<ul>
+<li><p>Imputation Method (RC-IM): regCalibCRS</p></li>
+<li><p>Deattenuation Factor Method (RC-DF): regCalibRSW</p></li>
+</ul>
+<section id="introduction-to-data-set" class="level3">
+<h3 class="anchored" data-anchor-id="introduction-to-data-set">1.1 Introduction to Data Set</h3>
+<p>The data is from a Study on <a href="https://www.nejm.org/doi/full/10.1056/NEJM198701013160105">Dietary Fat Intake and the Risk of Breast Cancer</a></p>
+<ul>
+<li><p>Main Study: 89,538 women returned a food frequency questionnaire (FFQ) in 1980 in the Nurses’ Health Study (NHS).</p>
+<ul>
+<li><p>Breast cancer incidence over the first 4 years of the follow-up was ascertained by self-report and validated through medical records review.</p></li>
+<li><p>Dietary intake (Z) was measured through a 61-item FFQ asking about the usual frequency of intake of the most common foods during the past year.</p></li>
+</ul></li>
+<li><p>Validation Study: 173 women from the MS.</p>
+<ul>
+<li>The VS participants recorded 4 one-week diet records (X) based on weighed food intake at 3-month intervals over a one-year period in 1981.</li>
+</ul></li>
+</ul>
+<section id="variable-dictionary" class="level4">
+<h4 class="anchored" data-anchor-id="variable-dictionary">Variable Dictionary</h4>
+<ul>
+<li><p><strong>fq</strong>*: Questionnaire-based error-prone surrogates.</p></li>
+<li><p><strong>dr</strong>*: diet-record-based (more accurate) dietary intakes derived from the 4 one-week diet records in the validation study.</p></li>
+<li><p>Variables contained in both <strong>main and validation data</strong>:</p>
+<ul>
+<li><p><strong>fq</strong>cal: Daily total caloric intake obtained from the dietary questionnaire (kcal/day).</p></li>
+<li><p><strong>fq</strong>calinc: Daily total caloric intake from the dietary questionnaire, expressed in units of 800 kcal/day.</p></li>
+<li><p><strong>fq</strong>tfat: Daily total fat intake obtained from the dietary questionnaire (g/day).</p></li>
+<li><p><strong>fq</strong>tfatinc: Daily total fat intake from the dietary questionnaire, expressed in units of 10 g/day.</p></li>
+<li><p><strong>fq</strong>alc: Daily alcohol intake obtained from the dietary questionnaire (g/day).</p></li>
+<li><p><strong>fq</strong>alcinc: Daily alcohol intake from the dietary questionnaire, expressed in units of 12 g/day.</p></li>
+<li><p>age: Age in years</p></li>
+<li><p>agec: Discretized age: &lt;40, [40, 45), [45, 55), [50,55),&gt;=50</p></li>
+</ul></li>
+<li><p>Variables contained in <strong>main data</strong>:</p>
+<ul>
+<li>case: Binary outcome variable, if the breast cancer occurred during the four year follow-up</li>
+</ul></li>
+<li><p>Contained in <strong>validation data</strong>:</p>
+<ul>
+<li><p><strong>dr</strong>cal: Daily total caloric intake from the diet record (kcal/day).</p></li>
+<li><p><strong>dr</strong>calinc: Daily total caloric intake from the diet record, expressed in units of 800 kcal/day.</p></li>
+<li><p><strong>dr</strong>tfat: Daily total fat intake from the diet record (g/day).</p></li>
+<li><p><strong>dr</strong>tfatinc: Daily total fat intake from the diet record, expressed in units of 10 g/day.</p></li>
+<li><p><strong>dr</strong>alc: Daily alcohol intake from the diet record (g/day).</p></li>
+<li><p><strong>dr</strong>alcinc: Daily alcohol intake from the diet record, expressed in units of 12 g/day.</p></li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="importing-data" class="level3">
+<h3 class="anchored" data-anchor-id="importing-data">1.2 Importing Data</h3>
+<p><span style="color:red; font-weight:bold;">Data Use Notice: The dataset provided here is for educational use in this short course only and can not be copied, redistributed, or used for any other purpose.</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read in the main study data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>main_data<span class="ot">&lt;-</span><span class="fu">read.csv</span>(<span class="st">"main_data_external.csv"</span>,<span class="at">row.names =</span> <span class="dv">1</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># read in the validation study data</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>valid_data<span class="ot">&lt;-</span><span class="fu">read.csv</span>(<span class="st">"valid_data_external.csv"</span>,<span class="at">row.names =</span> <span class="dv">1</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># show the first 5 rows of the data</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(main_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      id fqcal fqcalinc fqtfat fqtfatinc  fqalc  fqalcinc      age  agec case
+1 100008  1661  2.07625     88       8.8  8.413 0.7010833 48.75000 45~50    0
+2 100013  1573  1.96625     65       6.5  0.000 0.0000000 37.83333   &lt;40    0
+3 100015  1071  1.33875     44       4.4  7.549 0.6290833 45.66667 45~50    0
+4 100017  1000  1.25000     52       5.2 29.114 2.4261667 48.08333 45~50    0
+5 100018  2013  2.51625     79       7.9 11.137 0.9280833 54.91667 50~55    0
+6 100022  3073  3.84125    133      13.3  0.000 0.0000000 52.50000 50~55    0</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(valid_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      id  fqcal fqcalinc fqtfat fqtfatinc fqalc  fqalcinc drcal drcalinc drtfat
+1 100396 1242.2 1.552750   53.8      5.38  1.68 0.1400000  1807  2.25875  81.15
+2 100566  907.0 1.133750   36.6      3.66  0.00 0.0000000  1418  1.77250  53.28
+3 107633  786.0 0.982500   47.2      4.72 15.10 1.2583333  1889  2.36125  83.48
+4 107737 1392.5 1.740625   55.3      5.53  7.49 0.6241667  1426  1.78250  49.65
+5 107744 1259.8 1.574750   71.0      7.10 12.84 1.0700000  1253  1.56625  55.18
+6 107813  987.1 1.233875   41.1      4.11  0.00 0.0000000  1699  2.12375  73.83
+  drtfatinc dralc   dralcinc age  agec
+1     8.115  8.26 0.68833333  39   &lt;40
+2     5.328  0.83 0.06916667  49 45~50
+3     8.348 20.13 1.67750000  43 40~45
+4     4.965 11.16 0.93000000  51 50~55
+5     5.518  7.18 0.59833333  53 50~55
+6     7.383  1.76 0.14666667  54 50~55</code></pre>
+</div>
+</div>
+</section>
+<section id="data-exploration" class="level3">
+<h3 class="anchored" data-anchor-id="data-exploration">1.3 Data Exploration</h3>
+<p>Comparing the mean and standard deviation of questionnaire-based measures and diet record-based record measures in the validation study.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>summary_table1<span class="ot">&lt;-</span><span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">ncol=</span><span class="dv">4</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>summary_table1[<span class="dv">1</span>,]<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="fu">mean</span>(valid_data<span class="sc">$</span>fqcal), <span class="fu">sd</span>(valid_data<span class="sc">$</span>fqcal), <span class="fu">mean</span>(valid_data<span class="sc">$</span>drcal), <span class="fu">sd</span>(valid_data<span class="sc">$</span>drcal))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>summary_table1[<span class="dv">2</span>,]<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="fu">mean</span>(valid_data<span class="sc">$</span>fqtfat), <span class="fu">sd</span>(valid_data<span class="sc">$</span>fqtfat), <span class="fu">mean</span>(valid_data<span class="sc">$</span>drtfat), <span class="fu">sd</span>(valid_data<span class="sc">$</span>drtfat))</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>summary_table1[<span class="dv">3</span>,]<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="fu">mean</span>(valid_data<span class="sc">$</span>fqalc), <span class="fu">sd</span>(valid_data<span class="sc">$</span>fqalc), <span class="fu">mean</span>(valid_data<span class="sc">$</span>dralc), <span class="fu">sd</span>(valid_data<span class="sc">$</span>dralc))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">row.names</span>(summary_table1)<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"Total calories"</span>, <span class="st">"Total fat"</span>, <span class="st">"Alcohol intakes"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(summary_table1)<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"Mean (fq)"</span>, <span class="st">"SD (fq)"</span>, <span class="st">"Mean (dr)"</span>, <span class="st">"SD (dr)"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(summary_table1,<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                Mean (fq) SD (fq) Mean (dr) SD (dr)
+Total calories    1371.73  482.05   1619.87  323.41
+Total fat           56.08   21.97     68.62   16.29
+Alcohol intakes      8.95   12.25      8.96    9.66</code></pre>
+</div>
+</div>
+<p>Correlation between questionnaire-based measure and diet record-based record measures in the validation study.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>Summary_table2<span class="ot">&lt;-</span><span class="fu">cor</span>(valid_data[, <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>)], valid_data[,<span class="fu">c</span>(<span class="dv">8</span>,<span class="dv">10</span>,<span class="dv">12</span>)])</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>Summary_table2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           drcal    drtfat       dralc
+fqcal  0.3559695 0.2987738 -0.06172778
+fqtfat 0.3150312 0.3696641  0.01036997
+fqalc  0.1974423 0.1308419  0.84988383</code></pre>
+</div>
+</div>
+<p>The measures of total calories, total fat, and alcohol intakes from questionnaire and diet records are correlated.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(valid_data[, <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               fqcal     fqtfat         fqalc
+fqcal   1.0000000000 0.88621802 -0.0005010716
+fqtfat  0.8862180190 1.00000000  0.0760384810
+fqalc  -0.0005010716 0.07603848  1.0000000000</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(valid_data[,<span class="fu">c</span>(<span class="dv">8</span>,<span class="dv">10</span>,<span class="dv">12</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           drcal     drtfat      dralc
+drcal  1.0000000 0.88453882 0.20152169
+drtfat 0.8845388 1.00000000 0.09584735
+dralc  0.2015217 0.09584735 1.00000000</code></pre>
+</div>
+</div>
+<p><strong>Outcome model</strong>: <span class="math display">\[
+\begin{aligned}
+&amp;logit(\text{Probability of breast cancer occured})\\
+&amp;\sim\text{fat }(10g/day)\;+\;\text{calories }(800kcal/day)\;+\;\text{alcohol }(12g/day)\\
+&amp;\quad +\; \mathbf{1}\!\left(\text{age}\in[40,45)\right)
++\mathbf{1}\!\left(\text{age}\in[45,50)\right)
++\mathbf{1}\!\left(\text{age}\in[50,55)\right)
++\mathbf{1}\!\left(\text{age}\ge 50\right).
+\end{aligned}
+\]</span></p>
+<p>(age <span class="math inline">\(&lt;40\)</span> is the reference category for age.)</p>
+</section>
+<section id="naive-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="naive-analysis">1.4 Naive Analysis</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Logistic regression in the MS</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>uncorrected <span class="ot">&lt;-</span> <span class="fu">glm</span>(case <span class="sc">~</span> fqtfatinc <span class="sc">+</span> fqcalinc <span class="sc">+</span> fqalcinc <span class="sc">+</span> agec, <span class="at">data=</span>main_data, <span class="at">family=</span><span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>))</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># calculating the OR and CI</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>uncorrected_results<span class="ot">&lt;-</span><span class="fu">exp</span>(<span class="fu">cbind</span>(<span class="at">OR =</span> <span class="fu">coef</span>(uncorrected), <span class="fu">confint</span>(uncorrected)))</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>uncorrected_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                    OR       2.5 %     97.5 %
+(Intercept) 0.00380417 0.002696806 0.00531978
+fqtfatinc   0.97883434 0.924601002 1.03613092
+fqcalinc    1.00207749 0.770922385 1.29395543
+fqalcinc    1.14859818 1.064814610 1.23386158
+agec&gt;=50    2.66079494 2.004133696 3.56370240
+agec40~45   1.41923883 1.041903968 1.94118652
+agec45~50   2.28648649 1.731062686 3.04929876
+agec50~55   2.25490565 1.702950573 3.01337360</code></pre>
+</div>
+</div>
+</section>
+<section id="regression-calibration-deattenuation-factor-method-rc-df" class="level3">
+<h3 class="anchored" data-anchor-id="regression-calibration-deattenuation-factor-method-rc-df">1.5 Regression Calibration – Deattenuation Factor Method (RC-DF)</h3>
+<section id="assumptions" class="level4">
+<h4 class="anchored" data-anchor-id="assumptions">Assumptions</h4>
+<ol type="1">
+<li><p>Surrogacy</p></li>
+<li><p>Transportability</p></li>
+<li><p>Logistic-linearity of the outcome model</p></li>
+<li><p>Linearity in the measurement error model</p></li>
+</ol>
+<p><span class="math display">\[
+    \begin{aligned}
+    \mathrm{DR\_Alcohol}(12g/day)
+    &amp;\sim\mathrm{FFQ\_Alcohol}(12g/day)
+     + \mathrm{FFQ\_Total\_Fat}(10g/day)
+     + \mathrm{FFQ\_Calories}(800kcal/day) \\
+    &amp;\quad + \mathbf{1}\!\left(\mathrm{Age}\in[40,45)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\in[45,50)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\in[50,55)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\ge 50\right), \\[6pt]
+    \mathrm{DR\_Total\_Fat}(10g/day)
+    &amp;\sim \mathrm{FFQ\_Total\_Fat}(10g/day)
+     + \mathrm{FFQ\_Alcohol}(12g/day)
+     + \mathrm{FFQ\_Calories}(800kcal/day) \\
+    &amp;\quad + \mathbf{1}\!\left(\mathrm{Age}\in[40,45)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\in[45,50)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\in[50,55)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\ge 50\right), \\[6pt]
+    \mathrm{DR\_Calories}(800kcal/day)
+    &amp;\sim \mathrm{FFQ\_Calories}(800kcal/day)
+     + \mathrm{FFQ\_Alcohol}(12g/day)
+     + \mathrm{FFQ\_Total\_Fat}(10g/day) \\
+    &amp;\quad + \mathbf{1}\!\left(\mathrm{Age}\in[40,45)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\in[45,50)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\in[50,55)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\ge 50\right).
+    \end{aligned}
+    \]</span></p>
+<ol start="5" type="1">
+<li><p>For logistic regression, at least one of the following two conditions should hold:</p>
+<ul>
+<li><p>Small measurement error variance</p></li>
+<li><p>Rare disease outcome plus normally distributed homoscedastic error</p></li>
+</ul></li>
+</ol>
+</section>
+<section id="running-code" class="level4">
+<h4 class="anchored" data-anchor-id="running-code">Running code</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"regCalibRSW.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>rcdf <span class="ot">&lt;-</span> <span class="fu">regCalibRSW</span>(<span class="at">supplyEstimates =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="at">ms =</span> main_data,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="at">vs =</span> valid_data,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="at">sur =</span> <span class="fu">c</span>(<span class="st">"fqtfatinc"</span>,<span class="st">"fqcalinc"</span>,<span class="st">"fqalcinc"</span>), <span class="co"># mismeasured exposures and covaraites</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="at">exp =</span> <span class="fu">c</span>(<span class="st">"drtfatinc"</span>,<span class="st">"drcalinc"</span>,<span class="st">"dralcinc"</span>),</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="at">covCalib =</span> <span class="fu">c</span>(<span class="st">"agec"</span>),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="at">covOutcome =</span> <span class="cn">NULL</span>, <span class="co"># Correctly measured risk factors for outcome in the MS</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Should not include any variable from `covCalib`</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="at">outcome =</span> <span class="st">"case"</span>,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="at">method =</span> <span class="st">"glm"</span>, <span class="co"># methods for outcome modeling</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="at">family =</span> binomial, <span class="co"># family parameter being passed to glm</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="at">link =</span> <span class="st">"logit"</span>, <span class="co"># link function being passed to glm</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="at">external =</span> <span class="cn">TRUE</span>, <span class="co"># Indicates whether `vs` is an external validation set.</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="at">pointEstimates =</span> <span class="cn">NA</span>,</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="at">vcovEstimates =</span> <span class="cn">NA</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Corrected regression coefficients (exponentiated)</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>corrected_RC_DF<span class="ot">&lt;-</span><span class="fu">exp</span>(<span class="fu">cbind</span>(<span class="at">OR =</span> rcdf<span class="sc">$</span>correctedCoefTable[,<span class="dv">1</span>],</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="st">'2.5 %'</span> <span class="ot">=</span> rcdf<span class="sc">$</span>correctedCoefTable[,<span class="dv">5</span>],</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="st">'97.5 %'</span> <span class="ot">=</span> rcdf<span class="sc">$</span>correctedCoefTable[,<span class="dv">6</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compare results from naive and RC-DF methods</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cbind</span>(uncorrected_results[<span class="sc">-</span><span class="dv">1</span>,],corrected_RC_DF)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 OR     2.5 %   97.5 %        OR     2.5 %   97.5 %
+fqtfatinc 0.9788343 0.9246010 1.036131 0.9335793 0.7938682 1.097878
+fqcalinc  1.0020775 0.7709224 1.293955 1.0069521 0.4517235 2.244631
+fqalcinc  1.1485982 1.0648146 1.233862 1.2436176 1.0766925 1.436422
+agec&gt;=50  2.6607949 2.0041337 3.563702 2.5370281 1.8622682 3.456275
+agec40~45 1.4192388 1.0419040 1.941187 1.4257748 1.0381491 1.958133
+agec45~50 2.2864865 1.7310627 3.049299 2.1405215 1.5678133 2.922435
+agec50~55 2.2549056 1.7029506 3.013374 2.1353751 1.5683911 2.907328</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="regression-calibration-imputation-method-rc-im" class="level3">
+<h3 class="anchored" data-anchor-id="regression-calibration-imputation-method-rc-im">1.6 Regression Calibration – Imputation Method (RC-IM)</h3>
+<section id="assumptions-1" class="level4">
+<h4 class="anchored" data-anchor-id="assumptions-1">Assumptions</h4>
+<ol type="1">
+<li>Surrogacy</li>
+<li>Transportability</li>
+<li>Logistic-linearity of the outcome model</li>
+<li>The measurement error model is not limited to linear</li>
+<li>For logistic regression, at least one of the following two conditions should hold:
+<ul>
+<li><p>Small measurement error variance</p></li>
+<li><p>Rare disease outcome plus normally distributed homoscedastic error</p></li>
+</ul></li>
+</ol>
+</section>
+<section id="running-code-1" class="level4">
+<h4 class="anchored" data-anchor-id="running-code-1">Running code</h4>
+<ul>
+<li>Assume the measurement error model is linear.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># source the function for RC-IM</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"regCalibCRS.R"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>echo<span class="ot">=</span><span class="cn">FALSE</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># call regCalibCRS</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>rcim <span class="ot">&lt;-</span> <span class="fu">regCalibCRS</span>(<span class="at">ms =</span> main_data, <span class="co">#MS</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="at">vs =</span> valid_data, <span class="co">#VS</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="at">sur =</span> <span class="fu">c</span>(<span class="st">"fqtfatinc"</span>,<span class="st">"fqcalinc"</span>,<span class="st">"fqalcinc"</span>), <span class="co">#Mismeasured exposures and covaraites</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="at">exp =</span> <span class="fu">c</span>(<span class="st">"drtfatinc"</span>,<span class="st">"drcalinc"</span>,<span class="st">"dralcinc"</span>),</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Correctly measured exposure and covaraites with one-to-one correspondence to `sur`</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="at">covCalib =</span> <span class="fu">c</span>(<span class="st">"agec"</span>),</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Error-free covariates to adjust for in calibration model including non-linear terms.</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="at">covOutcome =</span> <span class="fu">c</span>(<span class="st">"agec"</span>),</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="co">#Error-free covariates to adjust for in outcome model including non-linear terms.</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="at">outcome =</span> <span class="st">"case"</span>,</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="at">method =</span> <span class="st">"glm"</span>, <span class="co">#Methods for outcome modeling</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="at">family =</span> binomial, <span class="co">#Family parameter being passed to glm</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="at">link =</span> <span class="st">"logit"</span>, <span class="co">#Link function being passed to glm</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="at">external =</span> <span class="cn">TRUE</span> <span class="co">#Indicates whether `vs` is an external validation set.</span></span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Corrected regression coefficients (exponentiated)</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>corrected_RC_IM<span class="ot">&lt;-</span><span class="fu">exp</span>(<span class="fu">cbind</span>(<span class="at">OR =</span> rcim<span class="sc">$</span>correctedCoefTable[,<span class="dv">1</span>],</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="st">'2.5 %'</span> <span class="ot">=</span> rcim<span class="sc">$</span>correctedCoefTable[,<span class="dv">5</span>],</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="st">'97.5 %'</span> <span class="ot">=</span> rcim<span class="sc">$</span>correctedCoefTable[,<span class="dv">6</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>corrected_RC_IM</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 OR     2.5 %   97.5 %
+drtfatinc 0.9335793 0.7938254 1.097937
+drcalinc  1.0069521 0.4353128 2.329251
+dralcinc  1.2436176 1.0547162 1.466352
+agec&gt;=50  2.5370281 1.9089889 3.371686
+agec40~45 1.4257748 1.1067126 1.836822
+agec45~50 2.1405215 1.6312957 2.808707
+agec50~55 2.1353751 1.6308090 2.796052</code></pre>
+</div>
+</div>
+</section>
+<section id="results-comparison" class="level4">
+<h4 class="anchored" data-anchor-id="results-comparison">Results Comparison</h4>
+<p>Compare the OR among naive, deattenuation factor, and imputation methods.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>combine_results1<span class="ot">&lt;-</span><span class="fu">as.data.frame</span>(<span class="fu">round</span>(<span class="fu">cbind</span>(uncorrected_results[<span class="sc">-</span><span class="dv">1</span>,], corrected_RC_DF, corrected_RC_IM),<span class="dv">2</span>))</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>combine_results1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            OR 2.5 % 97.5 %   OR 2.5 % 97.5 %   OR 2.5 % 97.5 %
+fqtfatinc 0.98  0.92   1.04 0.93  0.79   1.10 0.93  0.79   1.10
+fqcalinc  1.00  0.77   1.29 1.01  0.45   2.24 1.01  0.44   2.33
+fqalcinc  1.15  1.06   1.23 1.24  1.08   1.44 1.24  1.05   1.47
+agec&gt;=50  2.66  2.00   3.56 2.54  1.86   3.46 2.54  1.91   3.37
+agec40~45 1.42  1.04   1.94 1.43  1.04   1.96 1.43  1.11   1.84
+agec45~50 2.29  1.73   3.05 2.14  1.57   2.92 2.14  1.63   2.81
+agec50~55 2.25  1.70   3.01 2.14  1.57   2.91 2.14  1.63   2.80</code></pre>
+</div>
+</div>
+<p><strong>Exercise:</strong> Assume that only total fat intake (<code>fqtfatinc</code>) is measured with error, whereas total calorie intake and alcohol intake (<code>fqcalinc</code> and <code>fqalcinc</code>) are measured without error. How should the code be modified for the two methods under this assumption? How do the resulting estimates compare with those obtained from the model in which all three exposures are treated as error-prone?</p>
+<p>Hint</p>
+<ul>
+<li><p>Use the following calibration model:<br>
+<code>drtfatinc ~ fqtfatinc + fqcalinc + fqalcinc + agec</code></p></li>
+<li><p>Use the following outcome model:<br>
+<code>Cas ~ drtfatinc + fqcalinc + fqalcinc + agec</code></p></li>
+</ul>
+<p>Deattenuation factor method:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Deattenuation factor method</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>rcdf_fat <span class="ot">&lt;-</span> <span class="fu">regCalibRSW</span>(<span class="at">supplyEstimates =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="at">ms =</span> main_data,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="at">vs =</span> valid_data,</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="at">sur =</span> <span class="fu">c</span>(<span class="st">"fqtfatinc"</span>), <span class="co"># mismeasured exposures and covaraites</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="at">exp =</span> <span class="fu">c</span>(<span class="st">"drtfatinc"</span>),</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="at">covCalib =</span> <span class="fu">c</span>(<span class="st">"fqcalinc"</span>,<span class="st">"fqalcinc"</span>, <span class="st">"agec"</span>),</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="at">covOutcome =</span> <span class="cn">NULL</span>, <span class="co"># Correctly measured risk factors for outcome in the MS</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Should not include any variable from `covCalib`</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="at">outcome =</span> <span class="st">"case"</span>,</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="at">method =</span> <span class="st">"glm"</span>, <span class="co"># methods for outcome modeling</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="at">family =</span> binomial, <span class="co"># family parameter being passed to glm</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="at">link =</span> <span class="st">"logit"</span>, <span class="co"># link function being passed to glm</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="at">external =</span> <span class="cn">TRUE</span>, <span class="co"># Indicates whether `vs` is an external validation set.</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="at">pointEstimates =</span> <span class="cn">NA</span>,</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="at">vcovEstimates =</span> <span class="cn">NA</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="co">#Corrected regression coefficients (exponentiated)</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>corrected_RC_DF_fat<span class="ot">&lt;-</span><span class="fu">exp</span>(<span class="fu">cbind</span>(<span class="at">OR =</span> rcdf_fat<span class="sc">$</span>correctedCoefTable[,<span class="dv">1</span>],</span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="st">'2.5 %'</span> <span class="ot">=</span> rcdf_fat<span class="sc">$</span>correctedCoefTable[,<span class="dv">5</span>],</span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a><span class="st">'97.5 %'</span> <span class="ot">=</span> rcdf_fat<span class="sc">$</span>correctedCoefTable[,<span class="dv">6</span>]))</span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a><span class="co"># print results</span></span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>corrected_RC_DF_fat</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 OR     2.5 %   97.5 %
+drtfatinc 0.9341930 0.7744417 1.126898
+fqcalinc  0.9831908 0.7888872 1.225352
+fqalcinc  1.1582462 1.0759887 1.246792
+agec&gt;=50  2.5440034 1.8461166 3.505712
+agec40~45 1.4126969 1.0320012 1.933828
+agec45~50 2.1393680 1.5255212 3.000217
+agec50~55 2.1398589 1.5469335 2.960047</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>combine_results2<span class="ot">&lt;-</span><span class="fu">as.data.frame</span>(<span class="fu">round</span>(<span class="fu">cbind</span>(uncorrected_results[<span class="sc">-</span><span class="dv">1</span>,], corrected_RC_DF, corrected_RC_DF_fat),<span class="dv">2</span>))</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>combine_results2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            OR 2.5 % 97.5 %   OR 2.5 % 97.5 %   OR 2.5 % 97.5 %
+fqtfatinc 0.98  0.92   1.04 0.93  0.79   1.10 0.93  0.77   1.13
+fqcalinc  1.00  0.77   1.29 1.01  0.45   2.24 0.98  0.79   1.23
+fqalcinc  1.15  1.06   1.23 1.24  1.08   1.44 1.16  1.08   1.25
+agec&gt;=50  2.66  2.00   3.56 2.54  1.86   3.46 2.54  1.85   3.51
+agec40~45 1.42  1.04   1.94 1.43  1.04   1.96 1.41  1.03   1.93
+agec45~50 2.29  1.73   3.05 2.14  1.57   2.92 2.14  1.53   3.00
+agec50~55 2.25  1.70   3.01 2.14  1.57   2.91 2.14  1.55   2.96</code></pre>
+</div>
+</div>
+<p>Imputation method:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For Imputation method:</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>rcim_fat <span class="ot">&lt;-</span> <span class="fu">regCalibCRS</span>(<span class="at">ms =</span> main_data, <span class="co">#MS</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="at">vs =</span> valid_data, <span class="co">#VS</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="at">sur =</span> <span class="fu">c</span>(<span class="st">"fqtfatinc"</span>), <span class="co">#Mismeasured exposures and covaraites</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="at">exp =</span> <span class="fu">c</span>(<span class="st">"drtfatinc"</span>),</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Correctly measured exposure and covaraites with one-to-one correspondence to `sur`</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="at">covCalib =</span> <span class="fu">c</span>(<span class="st">"fqcalinc"</span>,<span class="st">"fqalcinc"</span>, <span class="st">"agec"</span>),</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Error-free covariates to adjust for in calibration model including non-linear terms.</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="at">covOutcome =</span> <span class="fu">c</span>(<span class="st">"fqcalinc"</span>,<span class="st">"fqalcinc"</span>, <span class="st">"agec"</span>),</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="co">#Error-free covariates to adjust for in outcome model including non-linear terms.</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="at">outcome =</span> <span class="st">"case"</span>,</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="at">method =</span> <span class="st">"glm"</span>, <span class="co">#Methods for outcome modeling</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="at">family =</span> binomial, <span class="co">#Family parameter being passed to glm</span></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a><span class="at">link =</span> <span class="st">"logit"</span>, <span class="co">#Link function being passed to glm</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a><span class="at">external =</span> <span class="cn">TRUE</span> <span class="co">#Indicates whether `vs` is an external validation set.</span></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>corrected_RC_IM_fat<span class="ot">&lt;-</span><span class="fu">exp</span>(<span class="fu">cbind</span>(<span class="at">OR =</span> rcim_fat<span class="sc">$</span>correctedCoefTable[,<span class="dv">1</span>],</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="st">'2.5 %'</span> <span class="ot">=</span> rcim_fat<span class="sc">$</span>correctedCoefTable[,<span class="dv">5</span>],</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="st">'97.5 %'</span> <span class="ot">=</span> rcim_fat<span class="sc">$</span>correctedCoefTable[,<span class="dv">6</span>]))</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>corrected_RC_IM_fat</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 OR     2.5 %   97.5 %
+drtfatinc 0.9341930 0.7698826 1.133571
+fqcalinc  0.9831908 0.7811568 1.237478
+fqalcinc  1.1582462 1.0581005 1.267870
+agec&gt;=50  2.5440034 1.8763931 3.449146
+agec40~45 1.4126969 1.0991324 1.815716
+agec45~50 2.1393680 1.5592900 2.935243
+agec50~55 2.1398589 1.5907076 2.878591</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>combine_results3<span class="ot">&lt;-</span><span class="fu">as.data.frame</span>(<span class="fu">round</span>(<span class="fu">cbind</span>(uncorrected_results[<span class="sc">-</span><span class="dv">1</span>,], corrected_RC_IM, corrected_RC_IM_fat),<span class="dv">2</span>))</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>combine_results3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            OR 2.5 % 97.5 %   OR 2.5 % 97.5 %   OR 2.5 % 97.5 %
+fqtfatinc 0.98  0.92   1.04 0.93  0.79   1.10 0.93  0.77   1.13
+fqcalinc  1.00  0.77   1.29 1.01  0.44   2.33 0.98  0.78   1.24
+fqalcinc  1.15  1.06   1.23 1.24  1.05   1.47 1.16  1.06   1.27
+agec&gt;=50  2.66  2.00   3.56 2.54  1.91   3.37 2.54  1.88   3.45
+agec40~45 1.42  1.04   1.94 1.43  1.11   1.84 1.41  1.10   1.82
+agec45~50 2.29  1.73   3.05 2.14  1.63   2.81 2.14  1.56   2.94
+agec50~55 2.25  1.70   3.01 2.14  1.63   2.80 2.14  1.59   2.88</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="nonlinearity-in-the-measurement-error-model" class="level3">
+<h3 class="anchored" data-anchor-id="nonlinearity-in-the-measurement-error-model">1.7 Nonlinearity in the Measurement Error Model</h3>
+<p>In the VS, we will fit the following non-linear measurement error models: <span class="math display">\[
+\begin{aligned}
+\mathrm{DR\_Alcohol}(12g/day)
+&amp;= \mathrm{FFQ\_Alcohol}(12g/day)
++ \mathrm{FFQ\_Total\_Fat}(10g/day)
++ \mathrm{FFQ\_Calories}(800kcal/day) \\
+&amp;\quad + \mathbf{1}\!\left(\mathrm{Age}\in[40,45)\right)
++ \mathbf{1}\!\left(\mathrm{Age}\in[45,50)\right)
++ \mathbf{1}\!\left(\mathrm{Age}\in[50,55)\right)
++ \mathbf{1}\!\left(\mathrm{Age}\ge 50\right)\\
+&amp;\quad +\text{Spline Terms for FFQ_Alcohol}, \\[6pt]
+\mathrm{DR\_Total\_Fat}(10g/day)
+&amp;= \mathrm{FFQ\_Total\_Fat}(10g/day)
++ \mathrm{FFQ\_Alcohol}(12g/day)
++ \mathrm{FFQ\_Calories}(800kcal/day) \\
+&amp;\quad + \mathbf{1}\!\left(\mathrm{Age}\in[40,45)\right)
++ \mathbf{1}\!\left(\mathrm{Age}\in[45,50)\right)
++ \mathbf{1}\!\left(\mathrm{Age}\in[50,55)\right)
++ \mathbf{1}\!\left(\mathrm{Age}\ge 50\right)\\
+  &amp;\quad +\text{Spline Terms for FFQ_Alcohol}, \\[6pt]
+\mathrm{DR\_Calories}(800kcal/day)
+&amp;= \mathrm{FFQ\_Calories}(800kcal/day)
++ \mathrm{FFQ\_Alcohol}(12g/day)
++ \mathrm{FFQ\_Total\_Fat}(10g/day) \\
+&amp;\quad + \mathbf{1}\!\left(\mathrm{Age}\in[40,45)\right)
++ \mathbf{1}\!\left(\mathrm{Age}\in[45,50)\right)
++ \mathbf{1}\!\left(\mathrm{Age}\in[50,55)\right)
++ \mathbf{1}\!\left(\mathrm{Age}\ge 50\right)\\
+  &amp;\quad +\text{Spline Terms for FFQ_Alcohol}.
+\end{aligned}
+\]</span></p>
+<p>Violation of Measurement Error Model Linearity Assumption: Sensitivity Analysis using RC-IM</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Hmisc)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Data preparation - create spline terms for alcohol</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>rcsalcList <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"rcsfqalc."</span>, <span class="fu">seq</span>(<span class="dv">1</span>,<span class="dv">3</span>))</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Include spline terms for every 12 g/day increment in alcohol in both MS and VS</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>rcsfqalc.main <span class="ot">&lt;-</span> <span class="fu">rcspline.eval</span>(main_data<span class="sc">$</span>fqalcinc, <span class="at">knots=</span><span class="fu">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>,<span class="fl">1.5</span>,<span class="dv">2</span>,<span class="dv">4</span>))</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(rcsfqalc.main) <span class="ot">&lt;-</span> rcsalcList</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>main1 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(main_data, rcsfqalc.main) <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>()</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>rcsfqalc <span class="ot">&lt;-</span> <span class="fu">rcspline.eval</span>(valid_data<span class="sc">$</span>fqalcinc, <span class="at">knots=</span><span class="fu">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>,<span class="fl">1.5</span>,<span class="dv">2</span>,<span class="dv">4</span>))</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(rcsfqalc) <span class="ot">&lt;-</span> rcsalcList</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>valid1 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(valid_data, rcsfqalc) <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>rcim_nl <span class="ot">&lt;-</span> <span class="fu">regCalibCRS</span>(<span class="at">ms =</span> main1, <span class="co"># MS</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="at">vs =</span> valid1, <span class="co"># VS</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="at">sur =</span> <span class="fu">c</span>(<span class="st">"fqtfatinc"</span>,<span class="st">"fqcalinc"</span>,<span class="st">"fqalcinc"</span>),</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="at">exp =</span> <span class="fu">c</span>(<span class="st">"drtfatinc"</span>,<span class="st">"drcalinc"</span>,<span class="st">"dralcinc"</span>),</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="at">covCalib =</span> <span class="fu">c</span>(<span class="st">"agec"</span>, <span class="st">"rcsfqalc.1"</span>, <span class="st">"rcsfqalc.2"</span>, <span class="st">"rcsfqalc.3"</span>),</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="co"># error-free covariates to adjust for in calibration model</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="co"># spline terms adjusted in the ME models included here</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="at">covOutcome =</span> <span class="fu">c</span>(<span class="st">"agec"</span>),</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a><span class="co"># error-free covariates to adjust for in outcome model</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a><span class="co"># including non-linear terms.</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a><span class="at">outcome =</span> <span class="st">"case"</span>,</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a><span class="at">method =</span> <span class="st">"glm"</span>, <span class="co"># methods for outcome modeling</span></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a><span class="at">family =</span> binomial, <span class="co"># family parameter being passed to glm</span></span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a><span class="at">link =</span> <span class="st">"logit"</span>, <span class="co"># link function being passed to glm</span></span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a><span class="at">external =</span> <span class="cn">TRUE</span> <span class="co"># Indicates whether `vs` is an external validation set.</span></span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print out results on OR scale</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>imputed_nl_results<span class="ot">&lt;-</span><span class="fu">exp</span>(<span class="fu">cbind</span>(<span class="at">OR =</span> rcim_nl<span class="sc">$</span>correctedCoefTable[,<span class="dv">1</span>],</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="st">'2.5 %'</span> <span class="ot">=</span> rcim_nl<span class="sc">$</span>correctedCoefTable[,<span class="dv">5</span>],</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="st">'97.5 %'</span> <span class="ot">=</span> rcim_nl<span class="sc">$</span>correctedCoefTable[,<span class="dv">6</span>]))</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>imputed_nl_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 OR     2.5 %   97.5 %
+drtfatinc 0.9563098 0.8226921 1.111629
+drcalinc  0.8926449 0.4134614 1.927181
+dralcinc  1.2724962 1.1001239 1.471876
+agec&gt;=50  2.5185785 1.9113127 3.318786
+agec40~45 1.4072803 1.0974011 1.804662
+agec45~50 2.1403372 1.6423450 2.789331
+agec50~55 2.1481155 1.6565357 2.785572</code></pre>
+</div>
+</div>
+<p>Compare results from naive, deattenuation, imputed methods and imputed method with nonlinear measurement error model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>Comparison_df<span class="ot">&lt;-</span><span class="fu">as.data.frame</span>(<span class="fu">round</span>(<span class="fu">cbind</span>(uncorrected_results[<span class="sc">-</span><span class="dv">1</span>,], corrected_RC_DF, corrected_RC_IM, imputed_nl_results),<span class="dv">2</span>))</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>Comparison_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            OR 2.5 % 97.5 %   OR 2.5 % 97.5 %   OR 2.5 % 97.5 %   OR 2.5 %
+fqtfatinc 0.98  0.92   1.04 0.93  0.79   1.10 0.93  0.79   1.10 0.96  0.82
+fqcalinc  1.00  0.77   1.29 1.01  0.45   2.24 1.01  0.44   2.33 0.89  0.41
+fqalcinc  1.15  1.06   1.23 1.24  1.08   1.44 1.24  1.05   1.47 1.27  1.10
+agec&gt;=50  2.66  2.00   3.56 2.54  1.86   3.46 2.54  1.91   3.37 2.52  1.91
+agec40~45 1.42  1.04   1.94 1.43  1.04   1.96 1.43  1.11   1.84 1.41  1.10
+agec45~50 2.29  1.73   3.05 2.14  1.57   2.92 2.14  1.63   2.81 2.14  1.64
+agec50~55 2.25  1.70   3.01 2.14  1.57   2.91 2.14  1.63   2.80 2.15  1.66
+          97.5 %
+fqtfatinc   1.11
+fqcalinc    1.93
+fqalcinc    1.47
+agec&gt;=50    3.32
+agec40~45   1.80
+agec45~50   2.79
+agec50~55   2.79</code></pre>
+</div>
+</div>
+</section>
+<section id="exercise" class="level3">
+<h3 class="anchored" data-anchor-id="exercise">Exercise</h3>
+<p>If only total fat intake (<code>fqtfatinc</code>) is measured with error, whereas total calorie intake and alcohol intake (<code>fqcalinc</code> and <code>fqalcinc</code>) are measured accurately, how should the code for the imputation method be modified when the measurement error model is nonlinear in alcohol?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>rcim_nl_fat <span class="ot">&lt;-</span> <span class="fu">regCalibCRS</span>(<span class="at">ms =</span> main1, <span class="co"># MS</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="at">vs =</span> valid1, <span class="co"># VS</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="at">sur =</span> <span class="fu">c</span>(<span class="st">"fqtfatinc"</span>),</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="at">exp =</span> <span class="fu">c</span>(<span class="st">"drtfatinc"</span>),</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="at">covCalib =</span> <span class="fu">c</span>(<span class="st">"fqcalinc"</span>,<span class="st">"fqalcinc"</span>, <span class="st">"agec"</span>, <span class="st">"rcsfqalc.1"</span>, <span class="st">"rcsfqalc.2"</span>, <span class="st">"rcsfqalc.3"</span>),</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="co"># error-free covariates to adjust for in calibration model</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="co"># spline terms adjusted in the ME models included here</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="at">covOutcome =</span> <span class="fu">c</span>(<span class="st">"fqcalinc"</span>,<span class="st">"fqalcinc"</span>, <span class="st">"agec"</span>),</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a><span class="co"># error-free covariates to adjust for in outcome model</span></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a><span class="co"># including non-linear terms.</span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a><span class="at">outcome =</span> <span class="st">"case"</span>,</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a><span class="at">method =</span> <span class="st">"glm"</span>, <span class="co"># methods for outcome modeling</span></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a><span class="at">family =</span> binomial, <span class="co"># family parameter being passed to glm</span></span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a><span class="at">link =</span> <span class="st">"logit"</span>, <span class="co"># link function being passed to glm</span></span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a><span class="at">external =</span> <span class="cn">TRUE</span> <span class="co"># Indicates whether `vs` is an external validation set.</span></span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print out results on OR scale</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>imputed_nl_results<span class="ot">&lt;-</span><span class="fu">exp</span>(<span class="fu">cbind</span>(<span class="at">OR =</span> rcim_nl<span class="sc">$</span>correctedCoefTable[,<span class="dv">1</span>],</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="st">'2.5 %'</span> <span class="ot">=</span> rcim_nl<span class="sc">$</span>correctedCoefTable[,<span class="dv">5</span>],</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="st">'97.5 %'</span> <span class="ot">=</span> rcim_nl<span class="sc">$</span>correctedCoefTable[,<span class="dv">6</span>]))</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>imputed_nl_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 OR     2.5 %   97.5 %
+drtfatinc 0.9563098 0.8226921 1.111629
+drcalinc  0.8926449 0.4134614 1.927181
+dralcinc  1.2724962 1.1001239 1.471876
+agec&gt;=50  2.5185785 1.9113127 3.318786
+agec40~45 1.4072803 1.0974011 1.804662
+agec45~50 2.1403372 1.6423450 2.789331
+agec50~55 2.1481155 1.6565357 2.785572</code></pre>
+</div>
+</div>
+<section id="testing-the-linearity-of-the-measurement-error-model" class="level4">
+<h4 class="anchored" data-anchor-id="testing-the-linearity-of-the-measurement-error-model">Testing the linearity of the measurement error model</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("lmtest")</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("ggpubr")</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lmtest)</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggpubr)</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"testLinear.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Testing the Linearity of the Measurement Error Model for Alcohol in VS</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test if the calibration model is linear</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>test6 <span class="ot">&lt;-</span> <span class="fu">testLinear</span>(<span class="at">ds =</span> valid_data,</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="at">outcome =</span> <span class="st">"dralc"</span>,</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="at">var =</span> <span class="st">"fqalc"</span>,</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a><span class="at">adj =</span> <span class="fu">c</span>(<span class="st">"fqtfat"</span>, <span class="st">"fqcal"</span>, <span class="st">"agec"</span>),</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a><span class="at">nknots =</span> <span class="dv">5</span>,</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a><span class="at">knotsvalues =</span> <span class="fu">c</span>(<span class="dv">6</span>,<span class="dv">12</span>,<span class="dv">18</span>,<span class="dv">24</span>,<span class="dv">48</span>),</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a><span class="at">method =</span> <span class="st">"lm"</span>,</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a><span class="at">densplot =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>test6<span class="sc">$</span>testOfLinearity</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                                        LRT-based chisq df
+Test of non-linear cubic spline terms                          50.01987  3
+Test of overall curvature (i.e. all cubic spline terms)       269.19826  4
+Test of linear term only.                                     219.17839  1
+                                                        p value
+Test of non-linear cubic spline terms                         0
+Test of overall curvature (i.e. all cubic spline terms)       0
+Test of linear term only.                                     0</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot spline</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>test6<span class="sc">$</span>fittedCBSplineCurve</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Regression-Calibration-demo_solution_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Exercise</strong>: Testing the Linearity of the Measurement Error Model for Total Calories in VS</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test if the calibration model is linear</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>test5 <span class="ot">&lt;-</span> <span class="fu">testLinear</span>(<span class="at">ds =</span> valid_data,</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="at">outcome =</span> <span class="st">"drcal"</span>,</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="at">var =</span> <span class="st">"fqcal"</span>,</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="at">adj =</span> <span class="fu">c</span>(<span class="st">"fqtfat"</span>, <span class="st">"fqalc"</span>, <span class="st">"agec"</span>),</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a><span class="at">nknots =</span> <span class="dv">5</span>,</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a><span class="at">method =</span> <span class="st">"lm"</span>,</span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a><span class="at">densplot =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>test5<span class="sc">$</span>testOfLinearity</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                                        LRT-based chisq df
+Test of non-linear cubic spline terms                          1.728298  3
+Test of overall curvature (i.e. all cubic spline terms)        9.480342  4
+Test of linear term only.                                      7.752044  1
+                                                        p value
+Test of non-linear cubic spline terms                    0.6307
+Test of overall curvature (i.e. all cubic spline terms)  0.0502
+Test of linear term only.                                0.0054</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot spline</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>test5<span class="sc">$</span>fittedCBSplineCurve</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Regression-Calibration-demo_solution_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Exercise:</strong> Linearity of the Measurement Error Model for Total Fat in the VS</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test if the calibration model is linear</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>test4 <span class="ot">&lt;-</span> <span class="fu">testLinear</span>(<span class="at">ds =</span> valid_data,</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="at">outcome =</span> <span class="st">"drtfat"</span>,</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="at">var =</span> <span class="st">"fqtfat"</span>,</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a><span class="at">adj =</span> <span class="fu">c</span>(<span class="st">"fqcal"</span>, <span class="st">"fqalc"</span>, <span class="st">"agec"</span>),</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a><span class="at">nknots =</span> <span class="dv">5</span>,</span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a><span class="at">method =</span> <span class="st">"lm"</span>,</span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a><span class="at">densplot =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>test4<span class="sc">$</span>testOfLinearity</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                                        LRT-based chisq df
+Test of non-linear cubic spline terms                          1.989486  3
+Test of overall curvature (i.e. all cubic spline terms)        9.879113  4
+Test of linear term only.                                      7.889627  1
+                                                        p value
+Test of non-linear cubic spline terms                    0.5746
+Test of overall curvature (i.e. all cubic spline terms)  0.0425
+Test of linear term only.                                0.0050</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot spline</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>test4<span class="sc">$</span>fittedCBSplineCurve</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Regression-Calibration-demo_solution_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="reliability-study-available" class="level2">
+<h2 class="anchored" data-anchor-id="reliability-study-available">2. Reliability Study Available</h2>
+<p>The R package <strong>RegCalReliab</strong> addresses measurement error in covariates when either an internal or an external reliability study is available. More details of the usage of the package are <a href="https://lbw080526.github.io/RegCalReliab/articles/regcal_example.html">here</a>.</p>
+</section>
+<section id="other-packages-on-regression-calibration" class="level2">
+<h2 class="anchored" data-anchor-id="other-packages-on-regression-calibration">3. Other Packages on Regression Calibration</h2>
+<p>The R package <strong>mecor</strong> implements regression calibration for linear model with continuous outcomes. More details of the usage of the package can be find <a href="https://cran.r-project.org/web/packages/mecor/refman/mecor.html">here</a>.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

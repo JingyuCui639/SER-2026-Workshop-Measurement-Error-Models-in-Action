@@ -1,0 +1,600 @@
+---
+title: "Regression Calibration Demo"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 5
+    css: styles.css
+editor: visual
+execute:
+  message: false
+  warning: false
+  author:
+  - name: Donna Spiegelman
+    affiliation: Yale School of Public Health
+  - name: Molin Wang
+    affiliation: Harvard T.H. Chan School of Public Health
+  - name: Jingyu Cui
+    affiliation: Yale School of Public Health
+  - name: Raymond J. Carroll
+    affiliation: Texas A\& M University
+---
+
+In this demo, we mainly focus on correcting for measurement error in covariates when the outcome is binary.
+
+```{r}
+# install packages
+# install.packages("dplyr")
+# install.packages("matrixcalc")
+# install.packages("earth")
+
+library(dplyr)
+library(matrixcalc)
+library(earth)
+```
+
+## 1. Two Methods for Regression Calibration if Validation Study Available
+
+-   Imputation Method (RC-IM): regCalibCRS
+
+-   Deattenuation Factor Method (RC-DF): regCalibRSW
+
+### 1.1 Introduction to Data Set
+
+The data is from a Study on [Dietary Fat Intake and the Risk of Breast Cancer](https://www.nejm.org/doi/full/10.1056/NEJM198701013160105)
+
+-   Main Study: 89,538 women returned a food frequency questionnaire (FFQ) in 1980 in the Nurses’ Health Study (NHS).
+
+    -   Breast cancer incidence over the first 4 years of the follow-up was ascertained by self-report and validated through medical records review.
+
+    -   Dietary intake (Z) was measured through a 61-item FFQ asking about the usual frequency of intake of the most common foods during the past year.
+
+-   Validation Study: 173 women from the MS.
+
+    -   The VS participants recorded 4 one-week diet records (X) based on weighed food intake at 3-month intervals over a one-year period in 1981.
+
+#### Variable Dictionary
+
+-   **fq**\*: Questionnaire-based error-prone surrogates.
+
+-   **dr**\*: diet-record-based (more accurate) dietary intakes derived from the 4 one-week diet records in the validation study.
+
+-   Variables contained in both **main and validation data**:
+
+    -   **fq**cal: Daily total caloric intake obtained from the dietary questionnaire (kcal/day).
+
+    -   **fq**calinc: Daily total caloric intake from the dietary questionnaire, expressed in units of 800 kcal/day.
+
+    -   **fq**tfat: Daily total fat intake obtained from the dietary questionnaire (g/day).
+
+    -   **fq**tfatinc: Daily total fat intake from the dietary questionnaire, expressed in units of 10 g/day.
+
+    -   **fq**alc: Daily alcohol intake obtained from the dietary questionnaire (g/day).
+
+    -   **fq**alcinc: Daily alcohol intake from the dietary questionnaire, expressed in units of 12 g/day.
+
+    -   age: Age in years
+
+    -   agec: Discretized age: \<40, \[40, 45), \[45, 55), \[50,55),\>=50
+
+-   Variables contained in **main data**:
+
+    -   case: Binary outcome variable, if the breast cancer occurred during the four year follow-up
+
+-   Contained in **validation data**:
+
+    -   **dr**cal: Daily total caloric intake from the diet record (kcal/day).
+
+    -   **dr**calinc: Daily total caloric intake from the diet record, expressed in units of 800 kcal/day.
+
+    -   **dr**tfat: Daily total fat intake from the diet record (g/day).
+
+    -   **dr**tfatinc: Daily total fat intake from the diet record, expressed in units of 10 g/day.
+
+    -   **dr**alc: Daily alcohol intake from the diet record (g/day).
+
+    -   **dr**alcinc: Daily alcohol intake from the diet record, expressed in units of 12 g/day.
+
+### 1.2 Importing Data
+
+[Data Use Notice: The dataset provided here is for educational use in this short course only and can not be copied, redistributed, or used for any other purpose.]{style="color:red; font-weight:bold;"}
+
+```{r}
+# read in the main study data
+main_data<-read.csv("main_data_external.csv",row.names = 1)
+
+# read in the validation study data
+valid_data<-read.csv("valid_data_external.csv",row.names = 1)
+
+# show the first 5 rows of the data
+head(main_data)
+
+```
+
+```{r}
+head(valid_data)
+```
+
+### 1.3 Data Exploration
+
+Comparing the mean and standard deviation of questionnaire-based measures and diet record-based record measures in the validation study.
+
+```{r}
+summary_table1<-matrix(NA, nrow = 3, ncol=4)
+summary_table1[1,]<-c(mean(valid_data$fqcal), sd(valid_data$fqcal), mean(valid_data$drcal), sd(valid_data$drcal))
+summary_table1[2,]<-c(mean(valid_data$fqtfat), sd(valid_data$fqtfat), mean(valid_data$drtfat), sd(valid_data$drtfat))
+summary_table1[3,]<-c(mean(valid_data$fqalc), sd(valid_data$fqalc), mean(valid_data$dralc), sd(valid_data$dralc))
+row.names(summary_table1)<-c("Total calories", "Total fat", "Alcohol intakes")
+colnames(summary_table1)<-c("Mean (fq)", "SD (fq)", "Mean (dr)", "SD (dr)")
+round(summary_table1,2)
+```
+
+Correlation between questionnaire-based measure and diet record-based record measures in the validation study.
+
+```{r}
+Summary_table2<-cor(valid_data[, c(2,4,6)], valid_data[,c(8,10,12)])
+Summary_table2
+```
+
+The measures of total calories, total fat, and alcohol intakes from questionnaire and diet records are correlated.
+
+```{r}
+cor(valid_data[, c(2,4,6)])
+```
+
+```{r}
+cor(valid_data[,c(8,10,12)])
+```
+
+**Outcome model**: $$
+\begin{aligned}
+&logit(\text{Probability of breast cancer occured})\\
+&\sim\text{fat }(10g/day)\;+\;\text{calories }(800kcal/day)\;+\;\text{alcohol }(12g/day)\\
+&\quad +\; \mathbf{1}\!\left(\text{age}\in[40,45)\right)
++\mathbf{1}\!\left(\text{age}\in[45,50)\right)
++\mathbf{1}\!\left(\text{age}\in[50,55)\right)
++\mathbf{1}\!\left(\text{age}\ge 50\right).
+\end{aligned}
+$$
+
+(age $<40$ is the reference category for age.)
+
+### 1.4 Naive Analysis
+
+```{r}
+# Logistic regression in the MS
+
+uncorrected <- glm(case ~ fqtfatinc + fqcalinc + fqalcinc + agec, data=main_data, family=binomial(link = "logit"))
+# calculating the OR and CI
+uncorrected_results<-exp(cbind(OR = coef(uncorrected), confint(uncorrected)))
+uncorrected_results
+```
+
+### 1.5 Regression Calibration – Deattenuation Factor Method (RC-DF)
+
+#### Assumptions
+
+1.  Surrogacy
+
+2.  Transportability
+
+3.  Logistic-linearity of the outcome model
+
+4.  Linearity in the measurement error model
+
+$$
+    \begin{aligned}
+    \mathrm{DR\_Alcohol}(12g/day)
+    &\sim\mathrm{FFQ\_Alcohol}(12g/day)
+     + \mathrm{FFQ\_Total\_Fat}(10g/day)
+     + \mathrm{FFQ\_Calories}(800kcal/day) \\
+    &\quad + \mathbf{1}\!\left(\mathrm{Age}\in[40,45)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\in[45,50)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\in[50,55)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\ge 50\right), \\[6pt]
+    \mathrm{DR\_Total\_Fat}(10g/day)
+    &\sim \mathrm{FFQ\_Total\_Fat}(10g/day)
+     + \mathrm{FFQ\_Alcohol}(12g/day)
+     + \mathrm{FFQ\_Calories}(800kcal/day) \\
+    &\quad + \mathbf{1}\!\left(\mathrm{Age}\in[40,45)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\in[45,50)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\in[50,55)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\ge 50\right), \\[6pt]
+    \mathrm{DR\_Calories}(800kcal/day)
+    &\sim \mathrm{FFQ\_Calories}(800kcal/day)
+     + \mathrm{FFQ\_Alcohol}(12g/day)
+     + \mathrm{FFQ\_Total\_Fat}(10g/day) \\
+    &\quad + \mathbf{1}\!\left(\mathrm{Age}\in[40,45)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\in[45,50)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\in[50,55)\right)
+     + \mathbf{1}\!\left(\mathrm{Age}\ge 50\right).
+    \end{aligned}
+    $$
+
+5.  For logistic regression, at least one of the following two conditions should hold:
+
+    -   Small measurement error variance
+
+    -   Rare disease outcome plus normally distributed homoscedastic error
+
+#### Running code
+
+```{r}
+source("regCalibRSW.R")
+```
+
+```{r}
+rcdf <- regCalibRSW(supplyEstimates = FALSE,
+ms = main_data,
+vs = valid_data,
+sur = c("fqtfatinc","fqcalinc","fqalcinc"), # mismeasured exposures and covaraites
+exp = c("drtfatinc","drcalinc","dralcinc"),
+covCalib = c("agec"),
+covOutcome = NULL, # Correctly measured risk factors for outcome in the MS
+# Should not include any variable from `covCalib`
+outcome = "case",
+method = "glm", # methods for outcome modeling
+family = binomial, # family parameter being passed to glm
+link = "logit", # link function being passed to glm
+external = TRUE, # Indicates whether `vs` is an external validation set.
+pointEstimates = NA,
+vcovEstimates = NA
+)
+```
+
+```{r}
+#Corrected regression coefficients (exponentiated)
+corrected_RC_DF<-exp(cbind(OR = rcdf$correctedCoefTable[,1],
+'2.5 %' = rcdf$correctedCoefTable[,5],
+'97.5 %' = rcdf$correctedCoefTable[,6]))
+
+```
+
+```{r}
+# compare results from naive and RC-DF methods
+cbind(uncorrected_results[-1,],corrected_RC_DF)
+```
+
+### 1.6 Regression Calibration – Imputation Method (RC-IM)
+
+#### Assumptions
+
+1.  Surrogacy
+2.  Transportability
+3.  Logistic-linearity of the outcome model
+4.  The measurement error model is not limited to linear
+5.  For logistic regression, at least one of the following two conditions should hold:
+    -   Small measurement error variance
+
+    -   Rare disease outcome plus normally distributed homoscedastic error
+
+#### Running code
+
+-   Assume the measurement error model is linear.
+
+```{r}
+
+# source the function for RC-IM
+source("regCalibCRS.R") 
+
+```
+
+```{r}
+echo=FALSE
+# call regCalibCRS
+rcim <- regCalibCRS(ms = main_data, #MS
+vs = valid_data, #VS
+sur = c("fqtfatinc","fqcalinc","fqalcinc"), #Mismeasured exposures and covaraites
+exp = c("drtfatinc","drcalinc","dralcinc"),
+#Correctly measured exposure and covaraites with one-to-one correspondence to `sur`
+covCalib = c("agec"),
+#Error-free covariates to adjust for in calibration model including non-linear terms.
+covOutcome = c("agec"),
+#Error-free covariates to adjust for in outcome model including non-linear terms.
+outcome = "case",
+method = "glm", #Methods for outcome modeling
+family = binomial, #Family parameter being passed to glm
+link = "logit", #Link function being passed to glm
+external = TRUE #Indicates whether `vs` is an external validation set.
+)
+```
+
+```{r}
+#Corrected regression coefficients (exponentiated)
+corrected_RC_IM<-exp(cbind(OR = rcim$correctedCoefTable[,1],
+'2.5 %' = rcim$correctedCoefTable[,5],
+'97.5 %' = rcim$correctedCoefTable[,6]))
+
+```
+
+```{r}
+corrected_RC_IM
+```
+
+#### Results Comparison
+
+Compare the OR among naive, deattenuation factor, and imputation methods.
+
+```{r}
+combine_results1<-as.data.frame(round(cbind(uncorrected_results[-1,], corrected_RC_DF, corrected_RC_IM),2))
+combine_results1
+```
+
+**Exercise:** Assume that only total fat intake (`fqtfatinc`) is measured with error, whereas total calorie intake and alcohol intake (`fqcalinc` and `fqalcinc`) are measured without error. How should the code be modified for the two methods under this assumption? How do the resulting estimates compare with those obtained from the model in which all three exposures are treated as error-prone?
+
+Hint
+
+-   Use the following calibration model:\
+    `drtfatinc ~ fqtfatinc + fqcalinc + fqalcinc + agec`
+
+-   Use the following outcome model:\
+    `Cas ~ drtfatinc + fqcalinc + fqalcinc + agec`
+
+Deattenuation factor method:
+
+```{r}
+#Deattenuation factor method
+rcdf_fat <- regCalibRSW(supplyEstimates = FALSE,
+ms = main_data,
+vs = valid_data,
+sur = c("fqtfatinc"), # mismeasured exposures and covaraites
+exp = c("drtfatinc"),
+covCalib = c("fqcalinc","fqalcinc", "agec"),
+covOutcome = NULL, # Correctly measured risk factors for outcome in the MS
+# Should not include any variable from `covCalib`
+outcome = "case",
+method = "glm", # methods for outcome modeling
+family = binomial, # family parameter being passed to glm
+link = "logit", # link function being passed to glm
+external = TRUE, # Indicates whether `vs` is an external validation set.
+pointEstimates = NA,
+vcovEstimates = NA
+)
+
+#Corrected regression coefficients (exponentiated)
+corrected_RC_DF_fat<-exp(cbind(OR = rcdf_fat$correctedCoefTable[,1],
+'2.5 %' = rcdf_fat$correctedCoefTable[,5],
+'97.5 %' = rcdf_fat$correctedCoefTable[,6]))
+
+# print results
+corrected_RC_DF_fat
+
+```
+
+```{r}
+combine_results2<-as.data.frame(round(cbind(uncorrected_results[-1,], corrected_RC_DF, corrected_RC_DF_fat),2))
+combine_results2
+```
+
+Imputation method:
+
+```{r}
+
+# For Imputation method:
+rcim_fat <- regCalibCRS(ms = main_data, #MS
+vs = valid_data, #VS
+sur = c("fqtfatinc"), #Mismeasured exposures and covaraites
+exp = c("drtfatinc"),
+#Correctly measured exposure and covaraites with one-to-one correspondence to `sur`
+covCalib = c("fqcalinc","fqalcinc", "agec"),
+#Error-free covariates to adjust for in calibration model including non-linear terms.
+covOutcome = c("fqcalinc","fqalcinc", "agec"),
+#Error-free covariates to adjust for in outcome model including non-linear terms.
+outcome = "case",
+method = "glm", #Methods for outcome modeling
+family = binomial, #Family parameter being passed to glm
+link = "logit", #Link function being passed to glm
+external = TRUE #Indicates whether `vs` is an external validation set.
+)
+```
+
+```{r}
+corrected_RC_IM_fat<-exp(cbind(OR = rcim_fat$correctedCoefTable[,1],
+'2.5 %' = rcim_fat$correctedCoefTable[,5],
+'97.5 %' = rcim_fat$correctedCoefTable[,6]))
+corrected_RC_IM_fat
+```
+
+```{r}
+combine_results3<-as.data.frame(round(cbind(uncorrected_results[-1,], corrected_RC_IM, corrected_RC_IM_fat),2))
+combine_results3
+```
+
+### 1.7 Nonlinearity in the Measurement Error Model
+
+In the VS, we will fit the following non-linear measurement error models: $$
+\begin{aligned}
+\mathrm{DR\_Alcohol}(12g/day)
+&= \mathrm{FFQ\_Alcohol}(12g/day)
+ + \mathrm{FFQ\_Total\_Fat}(10g/day)
+ + \mathrm{FFQ\_Calories}(800kcal/day) \\
+&\quad + \mathbf{1}\!\left(\mathrm{Age}\in[40,45)\right)
+ + \mathbf{1}\!\left(\mathrm{Age}\in[45,50)\right)
+ + \mathbf{1}\!\left(\mathrm{Age}\in[50,55)\right)
+ + \mathbf{1}\!\left(\mathrm{Age}\ge 50\right)\\
+ &\quad +\text{Spline Terms for FFQ_Alcohol}, \\[6pt]
+\mathrm{DR\_Total\_Fat}(10g/day)
+&= \mathrm{FFQ\_Total\_Fat}(10g/day)
+ + \mathrm{FFQ\_Alcohol}(12g/day)
+ + \mathrm{FFQ\_Calories}(800kcal/day) \\
+&\quad + \mathbf{1}\!\left(\mathrm{Age}\in[40,45)\right)
+ + \mathbf{1}\!\left(\mathrm{Age}\in[45,50)\right)
+ + \mathbf{1}\!\left(\mathrm{Age}\in[50,55)\right)
+ + \mathbf{1}\!\left(\mathrm{Age}\ge 50\right)\\
+  &\quad +\text{Spline Terms for FFQ_Alcohol}, \\[6pt]
+\mathrm{DR\_Calories}(800kcal/day)
+&= \mathrm{FFQ\_Calories}(800kcal/day)
+ + \mathrm{FFQ\_Alcohol}(12g/day)
+ + \mathrm{FFQ\_Total\_Fat}(10g/day) \\
+&\quad + \mathbf{1}\!\left(\mathrm{Age}\in[40,45)\right)
+ + \mathbf{1}\!\left(\mathrm{Age}\in[45,50)\right)
+ + \mathbf{1}\!\left(\mathrm{Age}\in[50,55)\right)
+ + \mathbf{1}\!\left(\mathrm{Age}\ge 50\right)\\
+  &\quad +\text{Spline Terms for FFQ_Alcohol}.
+\end{aligned}
+$$
+
+Violation of Measurement Error Model Linearity Assumption: Sensitivity Analysis using RC-IM
+
+```{r}
+library(Hmisc)
+# Data preparation - create spline terms for alcohol
+rcsalcList <- paste0("rcsfqalc.", seq(1,3))
+# Include spline terms for every 12 g/day increment in alcohol in both MS and VS
+rcsfqalc.main <- rcspline.eval(main_data$fqalcinc, knots=c(0.5,1,1.5,2,4))
+colnames(rcsfqalc.main) <- rcsalcList
+main1 <- cbind(main_data, rcsfqalc.main) %>% as.data.frame()
+rcsfqalc <- rcspline.eval(valid_data$fqalcinc, knots=c(0.5,1,1.5,2,4))
+colnames(rcsfqalc) <- rcsalcList
+valid1 <- cbind(valid_data, rcsfqalc) %>% as.data.frame()
+
+```
+
+```{r}
+rcim_nl <- regCalibCRS(ms = main1, # MS
+vs = valid1, # VS
+sur = c("fqtfatinc","fqcalinc","fqalcinc"),
+exp = c("drtfatinc","drcalinc","dralcinc"),
+covCalib = c("agec", "rcsfqalc.1", "rcsfqalc.2", "rcsfqalc.3"),
+# error-free covariates to adjust for in calibration model
+# spline terms adjusted in the ME models included here
+covOutcome = c("agec"),
+# error-free covariates to adjust for in outcome model
+# including non-linear terms.
+outcome = "case",
+method = "glm", # methods for outcome modeling
+family = binomial, # family parameter being passed to glm
+link = "logit", # link function being passed to glm
+external = TRUE # Indicates whether `vs` is an external validation set.
+)
+```
+
+```{r}
+# Print out results on OR scale
+imputed_nl_results<-exp(cbind(OR = rcim_nl$correctedCoefTable[,1],
+'2.5 %' = rcim_nl$correctedCoefTable[,5],
+'97.5 %' = rcim_nl$correctedCoefTable[,6]))
+imputed_nl_results
+```
+
+Compare results from naive, deattenuation, imputed methods and imputed method with nonlinear measurement error model:
+
+```{r}
+Comparison_df<-as.data.frame(round(cbind(uncorrected_results[-1,], corrected_RC_DF, corrected_RC_IM, imputed_nl_results),2))
+Comparison_df
+```
+
+### Exercise
+
+If only total fat intake (`fqtfatinc`) is measured with error, whereas total calorie intake and alcohol intake (`fqcalinc` and `fqalcinc`) are measured accurately, how should the code for the imputation method be modified when the measurement error model is nonlinear in alcohol?
+
+```{r}
+
+rcim_nl_fat <- regCalibCRS(ms = main1, # MS
+vs = valid1, # VS
+sur = c("fqtfatinc"),
+exp = c("drtfatinc"),
+covCalib = c("fqcalinc","fqalcinc", "agec", "rcsfqalc.1", "rcsfqalc.2", "rcsfqalc.3"),
+# error-free covariates to adjust for in calibration model
+# spline terms adjusted in the ME models included here
+covOutcome = c("fqcalinc","fqalcinc", "agec"),
+# error-free covariates to adjust for in outcome model
+# including non-linear terms.
+outcome = "case",
+method = "glm", # methods for outcome modeling
+family = binomial, # family parameter being passed to glm
+link = "logit", # link function being passed to glm
+external = TRUE # Indicates whether `vs` is an external validation set.
+)
+```
+
+```{r}
+# Print out results on OR scale
+imputed_nl_results<-exp(cbind(OR = rcim_nl$correctedCoefTable[,1],
+'2.5 %' = rcim_nl$correctedCoefTable[,5],
+'97.5 %' = rcim_nl$correctedCoefTable[,6]))
+imputed_nl_results
+```
+
+#### Testing the linearity of the measurement error model
+
+```{r}
+
+#install.packages("lmtest")
+#install.packages("ggpubr")
+
+library(lmtest)
+library(ggpubr)
+source("testLinear.R")
+
+```
+
+Testing the Linearity of the Measurement Error Model for Alcohol in VS
+
+```{r}
+# Test if the calibration model is linear
+test6 <- testLinear(ds = valid_data,
+outcome = "dralc",
+var = "fqalc",
+adj = c("fqtfat", "fqcal", "agec"),
+nknots = 5,
+knotsvalues = c(6,12,18,24,48),
+method = "lm",
+densplot = TRUE)
+test6$testOfLinearity
+```
+
+```{r}
+# Plot spline
+test6$fittedCBSplineCurve
+```
+
+**Exercise**: Testing the Linearity of the Measurement Error Model for Total Calories in VS
+
+```{r}
+# Test if the calibration model is linear
+test5 <- testLinear(ds = valid_data,
+outcome = "drcal",
+var = "fqcal",
+adj = c("fqtfat", "fqalc", "agec"),
+nknots = 5,
+method = "lm",
+densplot = TRUE)
+test5$testOfLinearity
+```
+
+```{r}
+# Plot spline
+test5$fittedCBSplineCurve
+
+```
+
+**Exercise:** Linearity of the Measurement Error Model for Total Fat in the VS
+
+```{r}
+# Test if the calibration model is linear
+test4 <- testLinear(ds = valid_data,
+outcome = "drtfat",
+var = "fqtfat",
+adj = c("fqcal", "fqalc", "agec"),
+nknots = 5,
+method = "lm",
+densplot = TRUE)
+test4$testOfLinearity
+
+```
+
+```{r}
+# Plot spline
+test4$fittedCBSplineCurve
+
+```
+
+## 2. Reliability Study Available
+
+The R package **RegCalReliab** addresses measurement error in covariates when either an internal or an external reliability study is available. More details of the usage of the package are [here](https://lbw080526.github.io/RegCalReliab/articles/regcal_example.html).
+
+## 3. Other Packages on Regression Calibration
+
+The R package **mecor** implements regression calibration for linear model with continuous outcomes. More details of the usage of the package can be find [here](https://cran.r-project.org/web/packages/mecor/refman/mecor.html).
