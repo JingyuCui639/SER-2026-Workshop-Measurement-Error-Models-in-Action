@@ -31,8 +31,10 @@ This repository contains the **demo code and datasets** used in the short course
 ### 2. Main Study/Validation Study Designs and Main Study/Reliability Study Designs  [ 1:30–2:00 PM]  
 - **Donna Spiegelman** *[Slides](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/2-Study_design/study%20design%20module%20--%20ENAR%20half%20day%20workshop%202026.pptx)*  
 
-### 3. Regression Calibration Methods for Adjusting Measurement Error Bias  [2:00–3:15 PM]  
-- **Molin Wang** *[Slides](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/3-Regression_calibration/ENAR_short_course%20MW%20final.pdf)*  
+### 3. Regression Calibration Methods for Adjusting Measurement Error Bias  [2:00–3:00 PM]  
+- **Molin Wang** *[Slides](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/3-Regression_calibration/ENAR_short_course%20MW%20final.pdf)*
+   
+### Break 15 mins ###
 
 ### 4. Hands-on Lab: R Examples from Nutritional and Environmental Epidemiology  [3:15–4:00 PM]  
 - **Jingyu Cui**  *[Download Code](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/4-R_lab.zip
