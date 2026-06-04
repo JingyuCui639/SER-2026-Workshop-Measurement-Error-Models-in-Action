@@ -34,7 +34,7 @@ This repository contains the **demo code and datasets** used in the short course
 ### 3. Regression Calibration Methods for Adjusting Measurement Error Bias  [2:00–3:00 PM]  
 - **Molin Wang** *[Slides](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/3-Regression_calibration/ENAR_short_course%20MW%20final.pdf)*
    
-### Break 15 mins ###
+###--- Break 15 mins ---###
 
 ### 4. Hands-on Lab: R Examples from Nutritional and Environmental Epidemiology  [3:15–4:00 PM]  
 - **Jingyu Cui**  *[Download Code](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/4-R_lab.zip
