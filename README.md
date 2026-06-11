@@ -91,7 +91,7 @@ Please see the solution of the demo code: [solution](https://jingyucui639.github
 # 📌 Notes
 
 - [Course Slides](/course_material) are available in the folder `/course_material`.
-- See the  documentation for R package [RegCalib]([docs/regCalibCRS_help.md](https://github.com/JingyuCui639/RegCalib/blob/main/README.md)) to implement imputation-based regression calibration method.
+- See the  documentation for R package [RegCalib](https://github.com/JingyuCui639/RegCalib/blob/main/README.md), which corrects measurement error by regression calibration method.
 - See the documentation for [testLinear](docs/testLinear_help.md) to test linearity for measurement error and outcome models.
 
 
