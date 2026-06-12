@@ -92,7 +92,7 @@ Please see the solution of the demo code: [solution](https://jingyucui639.github
 
 - [Course Slides](/course_material) are available in the folder `/course_material`.
 - See the documentation for [testLinear](docs/testLinear_help.md) to test linearity for measurement error and outcome models.
-- See the  documentation for R package [RegCalib](https://github.com/JingyuCui639/RegCalib/blob/main/README.md), which corrects measurement error by regression calibration method.
+- See the  documentation for R package [RegCalib](https://github.com/JingyuCui639/RegCalib/blob/main/README.md), which corrects measurement error by regression calibration method. The PDF manual can be downloaded here: [Download the PDF](https://raw.githubusercontent.com/USERNAME/REPOSITORY/main/files/paper.pdf).
 
 
 
