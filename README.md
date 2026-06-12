@@ -15,7 +15,7 @@ This repository contains the **demo code and datasets** used in the short course
 
 ![Molin Wang](images/SC5-Molin-Wang.png)
 
-**Molin Wang** is Associate Professor of Epidemiology and Biostatistics at the Harvard T.H. Chan School of Public Health. Her research addresses statistical challenges arising in large epidemiologic cohort studies, with particular emphasis on measurement error methods and their applications in nutritional and environmental epidemiology. She serves as lead statistician for several major cohort studies including the Nurses’ Health Study II and the Health Professionals Follow-up Study. 
+**Molin Wang** is Associate Professor of Epidemiology and Biostatistics at the Harvard T.H. Chan School of Public Health. Her research addresses statistical challenges arising in large epidemiologic cohort studies, with particular emphasis on measurement error methods and their applications in nutritional and environmental epidemiology. She serves as lead statistician for several major cohort studies, including the Nurses’ Health Study II and the Health Professionals Follow-up Study. 
 
 ![Jingyu Cui](images/SC5-Jingyu-Cui.jpg)
 
@@ -92,7 +92,9 @@ Please see the solution of the demo code: [solution](https://jingyucui639.github
 
 - [Course Slides](/course_material) are available in the folder `/course_material`.
 - See the documentation for [testLinear](docs/testLinear_help.md) to test linearity for measurement error and outcome models.
-- See the  documentation for R package [RegCalib](https://github.com/JingyuCui639/RegCalib/blob/main/README.md), which corrects measurement error by regression calibration method. The PDF manual can be downloaded here: [Download the PDF](https://raw.githubusercontent.com/USERNAME/REPOSITORY/main/files/paper.pdf).
+- See the  documentation for R package [RegCalib](https://github.com/JingyuCui639/RegCalib/blob/main/README.md), which corrects measurement error by regression calibration method. The PDF manual can be downloaded here: [Download the PDF](https://github.com/JingyuCui639/RegCalib/blob/main/docs/RegCalib_0.1.0.pdf).
+
+- 
 
 
 
