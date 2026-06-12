@@ -37,7 +37,7 @@ This repository contains the **demo code and datasets** used in the short course
 ### Break 10 mins ###
 
 ### 4. Hands-on Lab: R Examples from Nutritional and Environmental Epidemiology  [3:10–4:00 PM]  
-- **Jingyu Cui**  *[Download Code](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/4-R_lab.zip
+- **Jingyu Cui**  *[Download Code](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/4-R_lab-SER.zip
 )*;      *[Code running instructions](https://github.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/blob/main/README.md#%EF%B8%8F-setup-instructions-for-r-seccion)*
 
 ### 5. Variable Selection  [4:00–4:30 PM]  
@@ -62,7 +62,7 @@ https://cran.r-project.org/
 https://posit.co/download/rstudio-desktop/
 
 #### 2. Download R Code 
-[Link](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/4-R_lab.zip
+[Link](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/4-R_lab-SER.zip
 )
 
 **⚠ Data Use Notice:**  
@@ -77,9 +77,9 @@ After unzipping the file, the folder will contain the following files:
 | `main_data_external.csv` | Main study dataset |
 | `valid_data_external.csv` | External validation dataset |
 | `testLinear.R` | R function testing the linearity of measurement error and outcome models |
-| `Regression Calibration demo2.qmd` | Quarto document containing the demonstration code |
+| `Regression Calibration demo.Rmd` | R markdown containing the demonstration code |
 
-#### 4. Run `Regression Calibration demo2.qmd` in **RStudio**
+#### 4. Run `Regression Calibration demo.Rmd` in **RStudio**
 
 ---
 
