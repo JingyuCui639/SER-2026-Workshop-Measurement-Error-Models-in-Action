@@ -26,28 +26,28 @@ This repository contains the **demo code and datasets** used in the short course
 ## 📚 Agenda
 
 ### 1. Impact of Measurement Error and Overview of Correction Methods  [1:00–1:30 PM]  
-- **Donna Spiegelman** *[Slides](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/1-Intro/intro%20donna.pptx)*  
+- **Donna Spiegelman** *[Slides](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/1-Intro/intro%20donna.pptx)*  
 
 ### 2. Main Study/Validation Study Designs and Main Study/Reliability Study Designs  [ 1:30–2:00 PM]  
-- **Donna Spiegelman** *[Slides](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/2-Study_design/study%20design%20module%20--%20ENAR%20half%20day%20workshop%202026.pptx)*  
+- **Donna Spiegelman** *[Slides](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/2-Study_design/study%20design%20module%20--%20ENAR%20half%20day%20workshop%202026.pptx)*  
 
 ### 3. Regression Calibration Methods for Adjusting Measurement Error Bias  [2:00–3:00 PM]  
-- **Molin Wang** *[Slides](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/3-Regression_calibration/ENAR_short_course%20MW%20final.pdf)*
+- **Molin Wang** *[Slides](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/3-Regression_calibration/ENAR_short_course%20MW%20final.pdf)*
 
 ### Break 10 mins ###
 
 ### 4. Hands-on Lab: R Examples from Nutritional and Environmental Epidemiology  [3:10–4:00 PM]  
-- **Jingyu Cui**  *[Download Code](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/4-R_lab-SER.zip
-)*;      *[Code running instructions](https://github.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/blob/main/README.md#%EF%B8%8F-setup-instructions-for-r-seccion)*
+- **Jingyu Cui**  *[Download Code](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/4-R_lab-SER.zip
+)*;      *[Code running instructions](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/blob/main/README.md#%EF%B8%8F-setup-instructions-for-r-seccion)*
 
 ### 5. Variable Selection  [4:00–4:30 PM]  
-- **Molin Wang** *[Slides](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/5-Machine_learning/DML_ENAR%202026%20Molin%20final.pptx
+- **Molin Wang** *[Slides](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/5-Machine_learning/DML_ENAR%202026%20Molin%20final.pptx
 )*
   - Variable selection in regression calibration, with discussion of alternative approaches based on our work with Wenze 
   - Robust confounder control in higher-dimensional settings   
    
 ### 6. Applications in Nutritional and Environmental Epidemiology  [4:30–5:00 PM]  
-- **Donna Spiegelman** *[Slides](https://github.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/tree/main/course_material/6-Case_studies)*
+- **Donna Spiegelman** *[Slides](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/tree/main/course_material/6-Case_studies)*
 ---
 
 ## ⚙️ Setup Instructions for R Seccion
@@ -62,7 +62,7 @@ https://cran.r-project.org/
 https://posit.co/download/rstudio-desktop/
 
 #### 2. Download R Code 
-[Link](https://raw.githubusercontent.com/JingyuCui639/ENAR-2026-SC5-Measurement-Error-Models-in-Action/main/course_material/4-R_lab-SER.zip
+[Link](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/4-R_lab-SER.zip
 )
 
 **⚠ Data Use Notice:**  
@@ -85,7 +85,7 @@ After unzipping the file, the folder will contain the following files:
 
 ## Solution of Demo Code
 
-Please see the solution of the demo code: [solution](https://jingyucui639.github.io/ENAR-2026-SC5-Measurement-Error-Models-in-Action/).
+Please see the solution of the demo code: [solution](https://jingyucui639.github.io/SER-2026-Workshop-Measurement-Error-Models-in-Action/).
 
 
 # 📌 Notes
