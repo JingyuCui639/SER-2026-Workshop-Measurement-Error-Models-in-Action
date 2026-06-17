@@ -26,13 +26,13 @@ This repository contains the **demo code and datasets** used in the short course
 ## 📚 Agenda
 
 ### 1. Impact of Measurement Error and Overview of Correction Methods  [1:00–1:30 PM]  
-- **Donna Spiegelman** *[Slides](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/1-Intro/intro%20donna.pptx)*  
+- **Donna Spiegelman** *[Slides](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/tree/main/course_material/1-Introduction)*  
 
 ### 2. Main Study/Validation Study Designs and Main Study/Reliability Study Designs  [ 1:30–2:00 PM]  
-- **Donna Spiegelman** *[Slides](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/2-Study_design/study%20design%20module%20--%20ENAR%20half%20day%20workshop%202026.pptx)*  
+- **Donna Spiegelman** *[Slides](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/tree/main/course_material/2-Study_design)*  
 
 ### 3. Regression Calibration Methods for Adjusting Measurement Error Bias  [2:00–3:00 PM]  
-- **Molin Wang** *[Slides](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/3-Regression_calibration/ENAR_short_course%20MW%20final.pdf)*
+- **Molin Wang** *[Slides](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/blob/main/course_material/3%265-Regression_calibration_Causal_variable_selection/SER-regression_calibration_causal_slides.pdf)*
 
 ### Break 10 mins ###
 
@@ -41,8 +41,7 @@ This repository contains the **demo code and datasets** used in the short course
 )*;      *[Code running instructions](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/blob/main/README.md#%EF%B8%8F-setup-instructions-for-r-seccion)*
 
 ### 5. Causal Variable Selection  [4:00–4:30 PM]  
-- **Molin Wang** *[Slides](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/5-Machine_learning/DML_ENAR%202026%20Molin%20final.pptx
-)*
+- **Molin Wang** *[Slides](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/blob/main/course_material/3%265-Regression_calibration_Causal_variable_selection/SER-regression_calibration_causal_slides.pdf)*
    
 ### 6. Applications in Nutritional and Environmental Epidemiology  [4:30–5:00 PM]  
 - **Donna Spiegelman** *[Slides](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/tree/main/course_material/6-Case_studies)*
