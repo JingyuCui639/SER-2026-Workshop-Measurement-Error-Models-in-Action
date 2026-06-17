@@ -47,7 +47,7 @@ This repository contains the **demo code and datasets** used in the short course
 - **Donna Spiegelman** *[Slides](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/tree/main/course_material/6-Case_studies)*
 ---
 
-## ⚙️ Setup Instructions for R Seccion
+## ⚙️ Setup Instructions for R Section
 
 #### 1. Install R and RStudio
 Please ensure that the following software is installed on your computer.
