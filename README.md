@@ -81,6 +81,9 @@ After unzipping the file, the folder will contain the following files:
 
 #### 4. Run `Regression Calibration demo.Rmd` in **RStudio**
 
+In the demonstration, we will install the R package `RegCalib`, which provides functions for implementing the deattenuation factor approach and the substitution approach to correct for measurement error.
+
+The R package `RegCalib` is on the GitHub [repo](https://github.com/JingyuCui639/RegCalib), and its documentation can be found [here](https://github.com/JingyuCui639/RegCalib/blob/main/README.md). The PDF manual can be found here: [PDF manual](https://raw.githubusercontent.com/JingyuCui639/RegCalib/main/docs/RegCalib_0.1.0.pdf).
 ---
 
 ## Solution of Demo Code
@@ -92,7 +95,6 @@ Please see the solution of the demo code: [solution](https://jingyucui639.github
 
 - [Course Slides](/course_material) are available in the folder `/course_material`.
 - See the documentation for [testLinear](docs/testLinear_help.md) to test linearity for measurement error and outcome models.
-- See the  documentation for R package [RegCalib](https://github.com/JingyuCui639/RegCalib/blob/main/README.md), which corrects measurement error by regression calibration method. The PDF manual can be found here: [PDF manual](https://raw.githubusercontent.com/JingyuCui639/RegCalib/main/docs/RegCalib_0.1.0.pdf).
 
 
 
