@@ -61,7 +61,7 @@ https://cran.r-project.org/
 **RStudio**
 https://posit.co/download/rstudio-desktop/
 
-#### 2. Download R Code 
+#### 2. Download R Code for the Hands-on Lab
 [Link](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/4-R_lab-SER.zip
 )
 
@@ -81,7 +81,7 @@ After unzipping the file, the folder will contain the following files:
 
 #### 4. Run `Regression Calibration demo.Rmd` in **RStudio**
 
-In the demonstration, we will install the R package `RegCalib` from [GitHub repository](https://github.com/JingyuCui639/RegCalib). This package contains functions for implementing the deattenuation factor approach and the substitution approach to correct for measurement error. The PDF manual can be found here: [PDF manual](https://github.com/JingyuCui639/RegCalib/blob/main/docs/RegCalib_0.1.0.pdf).
+In the demonstration, we will install the R package `RegCalib` from [GitHub repository](https://github.com/JingyuCui639/RegCalib). This package contains functions for implementing the deattenuation factor approach `RegCalibDF()` and the substitution approach `RegCalibSub()` to correct for measurement error. The PDF manual can be found here: [PDF manual](https://github.com/JingyuCui639/RegCalib/blob/main/docs/RegCalib_0.1.0.pdf).
 
 ---
 
