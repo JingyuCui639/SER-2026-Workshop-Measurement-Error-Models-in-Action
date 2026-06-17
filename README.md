@@ -40,7 +40,7 @@ This repository contains the **demo code and datasets** used in the short course
 - **Jingyu Cui**  *[Download Code](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/4-R_lab-SER.zip
 )*;      *[Code running instructions](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/blob/main/README.md#%EF%B8%8F-setup-instructions-for-r-seccion)*
 
-### 5. Variable Selection  [4:00–4:30 PM]  
+### 5. Causal Variable Selection  [4:00–4:30 PM]  
 - **Molin Wang** *[Slides](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/5-Machine_learning/DML_ENAR%202026%20Molin%20final.pptx
 )*
   - Variable selection in regression calibration, with discussion of alternative approaches based on our work with Wenze 
