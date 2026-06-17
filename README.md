@@ -43,8 +43,6 @@ This repository contains the **demo code and datasets** used in the short course
 ### 5. Causal Variable Selection  [4:00–4:30 PM]  
 - **Molin Wang** *[Slides](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/5-Machine_learning/DML_ENAR%202026%20Molin%20final.pptx
 )*
-  - Variable selection in regression calibration, with discussion of alternative approaches based on our work with Wenze 
-  - Robust confounder control in higher-dimensional settings   
    
 ### 6. Applications in Nutritional and Environmental Epidemiology  [4:30–5:00 PM]  
 - **Donna Spiegelman** *[Slides](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/tree/main/course_material/6-Case_studies)*
