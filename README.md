@@ -38,7 +38,7 @@ This repository contains the **demo code and datasets** used in the short course
 ### Break 10 mins ###
 ---
 
-### 4. Hands-on Lab: R Examples from Nutritional and Environmental Epidemiology  [3:10–4:00 PM]  
+### 4. Hands-on Lab: R Examples in Epidemiology  [3:10–4:00 PM]  
 - **Jingyu Cui**  *[Download Code](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/4-R_lab-SER.zip
 )*;      *[Code running instructions](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/blob/main/README.md#%EF%B8%8F-setup-instructions-for-r-seccion)*
 
