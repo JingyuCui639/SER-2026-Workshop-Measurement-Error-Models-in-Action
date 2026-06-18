@@ -45,7 +45,7 @@ This repository contains the **demo code and datasets** used in the short course
 ### 5. Causal Variable Selection  [4:00–4:30 PM]  
 - **Molin Wang** *[Slides](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/blob/main/course_material/3%265-Regression_calibration_Causal_variable_selection/SER-regression_calibration_causal_slides.pdf)*
    
-### 6. Applications in Nutritional and Environmental Epidemiology  [4:30–5:00 PM]  
+### 6. Case Study  [4:30–5:00 PM]  
 - **Donna Spiegelman** *[Slides](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/tree/main/course_material/6-Case_studies)*
 ---
 
