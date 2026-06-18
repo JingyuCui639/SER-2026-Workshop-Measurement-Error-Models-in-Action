@@ -38,11 +38,11 @@ This repository contains the **demo code and datasets** used in the short course
 ### Break 10 mins ###
 ---
 
-### 4. Hands-on Lab: R Examples in Epidemiology  [3:10–4:00 PM]  
+### 4. Hands-On Lab: R Examples in Epidemiology  [3:10–4:00 PM]  
 - **Jingyu Cui**  *[Download Code](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/4-R_lab-SER.zip
 )*;      *[Code running instructions](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/blob/main/README.md#%EF%B8%8F-setup-instructions-for-r-seccion)*
 
-### 5. Causal Variable Selection  [4:00–4:30 PM]  
+### 5. Causal Variable Selection in Measurement Error Models  [4:00–4:30 PM]  
 - **Molin Wang** *[Slides](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/blob/main/course_material/3%265-Regression_calibration_Causal_variable_selection/SER-regression_calibration_causal_slides.pdf)*
    
 ### 6. Case Study  [4:30–5:00 PM]  
