@@ -34,7 +34,9 @@ This repository contains the **demo code and datasets** used in the short course
 ### 3. Regression Calibration Methods for Adjusting Measurement Error Bias  [2:00–3:00 PM]  
 - **Molin Wang** *[Slides](https://github.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/blob/main/course_material/3%265-Regression_calibration_Causal_variable_selection/SER-regression_calibration_causal_slides.pdf)*
 
+---
 ### Break 10 mins ###
+---
 
 ### 4. Hands-on Lab: R Examples from Nutritional and Environmental Epidemiology  [3:10–4:00 PM]  
 - **Jingyu Cui**  *[Download Code](https://raw.githubusercontent.com/JingyuCui639/SER-2026-Workshop-Measurement-Error-Models-in-Action/main/course_material/4-R_lab-SER.zip
